@@ -1,6 +1,6 @@
 
 ## 🇨🇳 中文
-
+[英文说明 (English)](README.md)
 基于 [Restormer](https://github.com/swz30/Restormer) 改进的AI闪光人像 Baseline 代码。
 
 ### 🎯 挑战动机

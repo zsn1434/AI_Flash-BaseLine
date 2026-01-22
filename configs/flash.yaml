@@ -1,0 +1,141 @@
+# general settings
+name: Restormer
+model_type: ImageCleanModel
+scale: 1
+num_gpu: 1  # 设为你的GPU数量
+manual_seed: 100
+
+# dataset and data loader settings
+datasets:
+  train:
+    name: TrainSet
+    type: Dataset_PairedImage
+    # 训练路径
+    dataroot_gt: processed_data/gt
+    dataroot_lq: processed_data/base_1k
+    geometric_augs: true
+
+    filename_tmpl: '{}'
+    io_backend:
+      type: disk
+
+    # data loader
+    use_shuffle: true
+    num_worker_per_gpu: 4
+    batch_size_per_gpu: 1  
+
+    mini_batch_sizes: [1]             
+    iters: [300000]
+    gt_size: 768  # 目前输入是768*768大小，如果想要使用原图大小，可以修改成0
+    gt_sizes: [768]
+    ### ------------------------------------------------------------
+
+    dataset_enlarge_ratio: 1
+    prefetch_mode: ~
+
+  val:
+    name: ValSet
+    type: Dataset_PairedImage
+    # 测试路径
+    dataroot_gt: processed_data/gt 
+    dataroot_lq: processed_data/base_1k
+    io_backend:
+      type: disk
+
+# network structures
+network_g:
+  type: Restormer
+  inp_channels: 3
+  out_channels: 3
+  dim: 16 
+  num_blocks: [2,2,2,2] 
+  num_refinement_blocks: 2
+  heads: [1,2,4,8]
+  ffn_expansion_factor: 2.66
+  bias: False
+  LayerNorm_type: BiasFree
+  dual_pixel_task: False
+
+# path
+path:
+  pretrain_network_g: ~
+  strict_load_g: true
+  resume_state: ~
+
+# training settings
+train:
+  total_iter: 300000
+  warmup_iter: -1 # no warm up
+  use_grad_clip: true
+
+  scheduler:
+    type: CosineAnnealingRestartCyclicLR
+    periods: [92000, 208000]       
+    restart_weights: [1,1]
+    eta_mins: [0.0003,0.000001]   
+  
+  mixing_augs:
+    mixup: false
+    mixup_beta: 1.2
+    use_identity: true
+
+  optim_g:
+    type: AdamW
+    lr: !!float 3e-4
+    weight_decay: !!float 1e-4
+    betas: [0.9, 0.999]
+  
+  # losses
+  pixel_opt:
+    type: CharbonnierLoss
+    loss_weight: 1.0
+    reduction: mean
+    eps: !!float 1e-3
+
+  grad_opt:
+    type: GradientLoss
+    loss_weight: 0.1
+
+  color_opt:
+    type: ColorLoss
+    loss_weight: 0.5
+    patch_size: 16
+
+  perceptual_opt:
+    type: PerceptualLoss
+    layer_weights:
+      'conv5_4': 1.0
+    vgg_type: vgg19
+    use_input_norm: true
+    range_norm: false
+    loss_weight: 0.1
+
+# validation settings
+val:
+  window_size: 8
+  val_freq: !!float 5e3 # 每 5000 次迭代验证一次
+  save_img: true        # 开启保存图片 (代码里已限制只存前10张)
+  rgb2bgr: true
+  use_image: false
+  max_minibatch: 8
+
+  metrics:
+    psnr: # metric name, can be arbitrary
+      type: calculate_psnr
+      crop_border: 0
+      test_y_channel: false
+
+# logging settings
+logger:
+  print_freq: 100
+  save_checkpoint_freq: !!float 5e3
+  use_tb_logger: true   # 开启 TensorBoard
+  wandb:
+    project: ~ # 设置 WandB 项目名称
+    resume_id: ~
+
+
+# dist training settings
+dist_params:
+  backend: nccl
+  port: 29500

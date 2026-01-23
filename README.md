@@ -37,13 +37,16 @@ This challenge provides a platform for industrial and academic participants to t
 
 ### 📥 Dataset Download
 
-Please download the dataset according to different stages:
+Please download the dataset from the competition page according to different stages:
 
-| Stage | Dataset | Download Link | Description |
-|-------|---------|---------------|-------------|
-| Stage 1 | Training Set | [TBD]() | Training images (input + GT pairs + person mask) |
+🔗 **Competition Link**: [https://www.codabench.org/competitions/12885/](https://www.codabench.org/competitions/12885/)
+
+| Stage | Dataset | Status | Description |
+|-------|---------|--------|-------------|
+| Stage 1 | Training Set | ✅ Available | Training images (input + GT pairs + person mask) |
 | Stage 2 | Test Set A | 🔒 Not Available | Test images for inference (no GT) |
 | Stage 3 | Test Set B | 🔒 Not Available | Test images for inference (no GT) |
+
 
 #### Directory Structure
 

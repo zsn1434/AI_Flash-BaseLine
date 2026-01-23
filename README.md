@@ -39,8 +39,8 @@ This challenge provides a platform for industrial and academic participants to t
 #### 1. Create Conda Environment
 
 ```bash
-conda create -n restormer python=3.10 -y
-conda activate restormer
+conda create -n aiflash python=3.10 -y
+conda activate aiflash
 ```
 
 #### 2. Install PyTorch (CUDA 12.1)
@@ -61,7 +61,7 @@ pip install einops gdown addict future lmdb "numpy<2" pyyaml requests scipy tens
 #### 4. Install BasicSR
 
 ```bash
-cd Restormer-main
+cd AI_Flash-BaseLine
 pip install -e .
 ```
 

@@ -34,6 +34,52 @@ This challenge provides a platform for industrial and academic participants to t
 
 ---
 
+
+---
+
+### 📥 Dataset Download
+
+Please download the dataset according to different stages:
+
+| Stage | Dataset | Download Link | Description |
+|-------|---------|---------------|-------------|
+| Stage 1 | Training Set | [TBD]() | Training images (input + GT pairs + person mask) |
+| Stage 2 | Test Set A | 🔒 Not Available | Test images for inference (no GT) |
+| Stage 3 | Test Set B | 🔒 Not Available | Test images for inference (no GT) |
+
+#### Directory Structure
+
+After downloading, please organize the data as follows:
+
+```
+AI_Flash-BaseLine/
+├── datasets/
+│   ├── train/
+│   │   ├── input/          # Training input images (low-light)
+│   │   │   ├── 0001.jpg
+│   │   │   ├── 0002.jpg
+│   │   │   └── ...
+│   │   └── gt/             # Training ground truth images
+│   │       ├── 0001.jpg
+│   │       ├── 0002.jpg
+│   │       └── ...
+│   ├── mask_personmask/         # Person segmentation masks
+│   │   ├── 0001.jpg
+│   │   ├── 0002.jpg
+│   │   └── ...
+│   └── test/
+│       └── input/          # Test input images
+│           ├── 0001.jpg
+│           ├── 0002.jpg
+│           └── ...
+├── configs/
+├── basicsr/
+└── ...
+```
+
+---
+
+
 ### Environment Setup
 
 #### 1. Create Conda Environment

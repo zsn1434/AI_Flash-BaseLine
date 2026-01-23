@@ -57,16 +57,20 @@ AI_Flash-BaseLine/
 │   │   │   ├── 0001.jpg
 │   │   │   ├── 0002.jpg
 │   │   │   └── ...
-│   │   └── gt/             # Training ground truth images
+│   │   ├── gt/             # Training ground truth images
+│   │   │   ├── 0001.jpg
+│   │   │   ├── 0002.jpg
+│   │   │   └── ...
+│   │   └── mask_personmask/    # Person segmentation masks (if used)
 │   │       ├── 0001.jpg
 │   │       ├── 0002.jpg
 │   │       └── ...
-│   ├── mask_personmask/         # Person segmentation masks
-│   │   ├── 0001.jpg
-│   │   ├── 0002.jpg
-│   │   └── ...
 │   └── test/
-│       └── input/          # Test input images
+│       ├── input/          # Test input images
+│       │   ├── 0001.jpg
+│       │   ├── 0002.jpg
+│       │   └── ...
+│       └── mask_personmask/    # Person segmentation masks (if used)
 │           ├── 0001.jpg
 │           ├── 0002.jpg
 │           └── ...

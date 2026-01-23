@@ -129,11 +129,13 @@ def pad_to_multiple(img_tensor, multiple=8):
     返回: (padded_tensor, original_h, original_w)
     """
     _, _, h, w = img_tensor.shape
-    pad_h = (multiple - h % multiple) % multiple
-    pad_w = (multiple - w % multiple) % multiple
+    H = ((h + multiple) // multiple) * multiple
+    W = ((w + multiple) // multiple) * multiple
+    padh = H - h if h % multiple != 0 else 0
+    padw = W - w if w % multiple != 0 else 0
     
-    if pad_h > 0 or pad_w > 0:
-        img_tensor = F.pad(img_tensor, (0, pad_w, 0, pad_h), mode='reflect')
+    if padh > 0 or padw > 0:
+        img_tensor = F.pad(img_tensor, (0, padw, 0, padh), mode='reflect')
     
     return img_tensor, h, w
 
@@ -157,8 +159,8 @@ def inference_tile(model, input_tensor, tile_size, tile_overlap):
     w_idx_list = list(range(0, w - tile, stride)) + [w - tile]
     
     # 输出和权重累加器
-    output = torch.zeros(b, c, h, w).type_as(input_tensor)
-    weight = torch.zeros_like(output)
+    E = torch.zeros(b, c, h, w).type_as(input_tensor)
+    W = torch.zeros_like(E)
     
     for h_idx in h_idx_list:
         for w_idx in w_idx_list:
@@ -172,12 +174,15 @@ def inference_tile(model, input_tensor, tile_size, tile_overlap):
             if isinstance(out_patch, list):
                 out_patch = out_patch[-1]
             
+            # 创建权重mask
+            out_patch_mask = torch.ones_like(out_patch)
+            
             # 累加输出和权重
-            output[..., h_idx:h_idx+tile, w_idx:w_idx+tile] += out_patch
-            weight[..., h_idx:h_idx+tile, w_idx:w_idx+tile] += 1
+            E[..., h_idx:(h_idx+tile), w_idx:(w_idx+tile)].add_(out_patch)
+            W[..., h_idx:(h_idx+tile), w_idx:(w_idx+tile)].add_(out_patch_mask)
     
     # 平均重叠区域
-    output = output / weight
+    output = E.div_(W)
     
     return output
 
@@ -189,8 +194,7 @@ def process_image(model, img_path, output_dir, device, tile_size=None, tile_over
     img = load_img(img_path)
     
     # 转换为 tensor: (H, W, C) -> (1, C, H, W), 归一化到 [0, 1]
-    input_tensor = torch.from_numpy(img).float().div(255.)
-    input_tensor = input_tensor.permute(2, 0, 1).unsqueeze(0).to(device)
+    input_tensor = torch.from_numpy(img).float().div(255.).permute(2, 0, 1).unsqueeze(0).to(device)
     
     # Pad 到 8 的倍数
     input_padded, padded_h, padded_w = pad_to_multiple(input_tensor, multiple=8)
@@ -212,8 +216,8 @@ def process_image(model, img_path, output_dir, device, tile_size=None, tile_over
     output = output[:, :, :padded_h, :padded_w]
     
     # 转换回 numpy: (1, C, H, W) -> (H, W, C)
-    output_np = output.squeeze(0).permute(1, 2, 0).cpu().numpy()
-    output_np = img_as_ubyte(output_np)
+    output_np = output.permute(0, 2, 3, 1).cpu().detach().numpy()
+    output_np = img_as_ubyte(output_np[0])
     
     # 保存结果
     filename = os.path.splitext(os.path.basename(img_path))[0]

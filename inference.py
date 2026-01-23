@@ -3,13 +3,10 @@ Restormer Inference Script
 从 YAML 配置文件加载模型参数进行推理
 
 使用示例:
-    # 基础用法 - 4K 输入，下采样 4 倍推理，再上采样回 4K
+    # 基础用法
     python inference.py --config configs/flash.yaml --weights path/to/model.pth --input_dir ./test/input --output_dir ./test/output
     
-    # 不使用下采样（直接原图推理，需要大显存）
-    python inference.py --config configs/flash.yaml --weights path/to/model.pth --input_dir ./test/input --output_dir ./test/output --scale 1
-    
-    # 使用 tile 模式处理大图
+    # 使用 tile 模式处理大图（显存不足时使用）
     python inference.py --config configs/flash.yaml --weights path/to/model.pth --input_dir ./test/input --output_dir ./test/output --tile 512 --tile_overlap 32
     
     # 处理单张图片
@@ -45,8 +42,6 @@ def parse_args():
                         help='Overlap between tiles')
     parser.add_argument('--device', type=str, default='cuda',
                         help='Device to use: cuda or cpu')
-    parser.add_argument('--scale', type=int, default=4,
-                        help='Downscale factor before inference, then upscale back. Default: 4 (for 4K->1K->4K)')
     return parser.parse_args()
 
 
@@ -188,26 +183,13 @@ def inference_tile(model, input_tensor, tile_size, tile_overlap):
 
 
 @torch.no_grad()
-def process_image(model, img_path, output_dir, device, tile_size=None, tile_overlap=32, scale=4):
-    """处理单张图像
-    
-    Args:
-        scale: 下采样倍数。输入先下采样 scale 倍，推理后再上采样回原始分辨率。
-               例如 scale=4 表示 4K -> 1K -> 4K
-    """
+def process_image(model, img_path, output_dir, device, tile_size=None, tile_overlap=32):
+    """处理单张图像"""
     # 加载图像
     img = load_img(img_path)
-    orig_h, orig_w = img.shape[:2]
-    
-    # 下采样（4K -> 1K）
-    if scale > 1:
-        new_h, new_w = orig_h // scale, orig_w // scale
-        img_downscaled = cv2.resize(img, (new_w, new_h), interpolation=cv2.INTER_AREA)
-    else:
-        img_downscaled = img
     
     # 转换为 tensor: (H, W, C) -> (1, C, H, W), 归一化到 [0, 1]
-    input_tensor = torch.from_numpy(img_downscaled).float().div(255.)
+    input_tensor = torch.from_numpy(img).float().div(255.)
     input_tensor = input_tensor.permute(2, 0, 1).unsqueeze(0).to(device)
     
     # Pad 到 8 的倍数
@@ -232,10 +214,6 @@ def process_image(model, img_path, output_dir, device, tile_size=None, tile_over
     # 转换回 numpy: (1, C, H, W) -> (H, W, C)
     output_np = output.squeeze(0).permute(1, 2, 0).cpu().numpy()
     output_np = img_as_ubyte(output_np)
-    
-    # 上采样回原始分辨率（1K -> 4K）
-    if scale > 1:
-        output_np = cv2.resize(output_np, (orig_w, orig_h), interpolation=cv2.INTER_CUBIC)
     
     # 保存结果
     filename = os.path.splitext(os.path.basename(img_path))[0]
@@ -293,9 +271,6 @@ def main():
     else:
         print('Using full resolution mode')
     
-    if args.scale > 1:
-        print(f'Using scale mode: downscale {args.scale}x before inference, upscale {args.scale}x after')
-    
     print('\n' + '='*50)
     print('Starting inference...')
     print('='*50 + '\n')
@@ -313,8 +288,7 @@ def main():
                 output_dir=args.output_dir,
                 device=device,
                 tile_size=args.tile,
-                tile_overlap=args.tile_overlap,
-                scale=args.scale
+                tile_overlap=args.tile_overlap
             )
         except Exception as e:
             print(f'\nError processing {img_path}: {e}')

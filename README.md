@@ -35,8 +35,6 @@ This challenge provides a platform for industrial and academic participants to t
 ---
 
 
----
-
 ### 📥 Dataset Download
 
 Please download the dataset according to different stages:

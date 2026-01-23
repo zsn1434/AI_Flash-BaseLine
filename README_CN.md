@@ -38,8 +38,8 @@
 #### 1. 创建 Conda 环境
 
 ```bash
-conda create -n restormer python=3.10 -y
-conda activate restormer
+conda create -n aiflash python=3.10 -y
+conda activate aiflash
 ```
 
 #### 2. 安装 PyTorch (CUDA 12.1)
@@ -60,7 +60,7 @@ pip install einops gdown addict future lmdb "numpy<2" pyyaml requests scipy tens
 #### 4. 安装 BasicSR
 
 ```bash
-cd Restormer-main
+cd AI_Flash-BaseLine
 pip install -e .
 ```
 

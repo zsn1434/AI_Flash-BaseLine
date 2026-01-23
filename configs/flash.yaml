@@ -11,8 +11,8 @@ datasets:
     name: TrainSet
     type: Dataset_PairedImage
     # 训练路径
-    dataroot_gt: Phase1/gt
-    dataroot_lq: Phase1/base_1k
+    dataroot_gt: datasets/train/gt
+    dataroot_lq: datasets/train/base_1k
     geometric_augs: true
 
     filename_tmpl: '{}'
@@ -36,9 +36,9 @@ datasets:
   val:
     name: ValSet
     type: Dataset_PairedImage
-    # 测试路径
-    dataroot_gt: Phase1/gt 
-    dataroot_lq: Phase1/base_1k
+    # 验证集，目前直接使用训练集，有需要请自行修改
+    dataroot_gt: datasets/train/gt 
+    dataroot_lq: datasets/train/base_1k
     io_backend:
       type: disk
 

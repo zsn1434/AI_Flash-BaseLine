@@ -80,9 +80,9 @@ python basicsr/train.py -opt configs/flash.yaml
 ```bash
 python inference.py \
     --config configs/flash.yaml \
-    --weights experiments/RestormerV1_good_train/models/net_g_95000.pth \
-    --input_dir ./test/input \
-    --output_dir ./test/output
+    --weights pth/net_g_xxx.pth \
+    --input_dir test/input \
+    --output_dir test/output
 ```
 
 #### Inference Parameters

@@ -164,20 +164,14 @@ def inference_tile(model, input_tensor, tile_size, tile_overlap):
     
     for h_idx in h_idx_list:
         for w_idx in w_idx_list:
-            # 提取 tile
             in_patch = input_tensor[..., h_idx:h_idx+tile, w_idx:w_idx+tile]
-            
-            # 推理
             out_patch = model(in_patch)
             
             # 处理可能的 list 输出
             if isinstance(out_patch, list):
                 out_patch = out_patch[-1]
             
-            # 创建权重mask
             out_patch_mask = torch.ones_like(out_patch)
-            
-            # 累加输出和权重
             E[..., h_idx:(h_idx+tile), w_idx:(w_idx+tile)].add_(out_patch)
             W[..., h_idx:(h_idx+tile), w_idx:(w_idx+tile)].add_(out_patch_mask)
     
@@ -190,7 +184,6 @@ def inference_tile(model, input_tensor, tile_size, tile_overlap):
 @torch.no_grad()
 def process_image(model, img_path, output_dir, device, tile_size=None, tile_overlap=32):
     """处理单张图像"""
-    # 加载图像
     img = load_img(img_path)
     
     # 转换为 tensor: (H, W, C) -> (1, C, H, W), 归一化到 [0, 1]
@@ -199,7 +192,6 @@ def process_image(model, img_path, output_dir, device, tile_size=None, tile_over
     # Pad 到 8 的倍数
     input_padded, padded_h, padded_w = pad_to_multiple(input_tensor, multiple=8)
     
-    # 推理
     if tile_size is None:
         output = inference_full(model, input_padded)
     else:
@@ -209,17 +201,13 @@ def process_image(model, img_path, output_dir, device, tile_size=None, tile_over
     if isinstance(output, list):
         output = output[-1]
     
-    # Clamp 到 [0, 1]
     output = torch.clamp(output, 0, 1)
-    
-    # 移除 padding
     output = output[:, :, :padded_h, :padded_w]
     
     # 转换回 numpy: (1, C, H, W) -> (H, W, C)
     output_np = output.permute(0, 2, 3, 1).cpu().detach().numpy()
     output_np = img_as_ubyte(output_np[0])
     
-    # 保存结果
     filename = os.path.splitext(os.path.basename(img_path))[0]
     output_path = os.path.join(output_dir, f'{filename}.png')
     save_img(output_path, output_np)
@@ -306,3 +294,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+     

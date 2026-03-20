@@ -1,0 +1,42 @@
+
+mask_dir: ref/mask_personmask
+use_torch: true
+
+mask_patterns:
+  person: ["{id}.jpg", "{id}.jpeg", "{id}.png", "{id}.bmp"]
+
+metrics:
+- name: PSNR_bg
+type: psnr
+mask: person
+invert_mask: true
+normalize:
+  type: minmax
+  min: 15.0
+  max: 38.0
+  clip: true   
+- name: SSIM_global
+type: ssim
+mask: null
+normalize:
+  type: minmax
+  min: 0.60
+  max: 0.99
+  clip: true
+- name: DeltaE_person
+type: deltae
+mask: person
+normalize:
+  type: invert_minmax
+  min: 2.0
+  max: 40.0
+  clip: true   
+- name: LPIPS_person
+type: lpips
+mask: person
+pad: 8
+normalize:
+  type: invert_minmax
+  min: 0.0
+  max: 0.15
+  clip: true   

@@ -39,7 +39,7 @@ This challenge provides a platform for industrial and academic participants to t
 
 The full dataset is now publicly available (all stages, with GT) on Hugging Face. The original competition page is kept for reference:
 
-- Public dataset: [https://huggingface.co/datasets/zsn1434/AI_Flash_Portrait/tree/main](https://huggingface.co/datasets/zsn1434/AI_Flash_Portrait/tree/main)
+- Public dataset: [https://huggingface.co/datasets/zsn1434/AI_Flash_Portrait/tree/main](https://huggingface.co/datasets/zsn1434/AI_Flash_Portrait)
 - Competition page: [https://www.codabench.org/competitions/12885/](https://www.codabench.org/competitions/12885/)
 
 | Stage | Dataset | Status | Description |

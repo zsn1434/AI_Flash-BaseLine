@@ -36,16 +36,16 @@
 
 ### 📥 数据集下载
 
+当前数据集已全部公开（包含各阶段与 GT），推荐从 Hugging Face 获取；原比赛页面保留以供参考：
 
-请从比赛页面根据不同阶段下载对应数据集：
-
-🔗 **比赛链接**: [https://www.codabench.org/competitions/12885/](https://www.codabench.org/competitions/12885/)
+- 公共数据集：[https://huggingface.co/datasets/zsn1434/AI_Flash_Portrait](https://huggingface.co/datasets/zsn1434/AI_Flash_Portrait/tree/main)
+- 比赛页面：[https://www.codabench.org/competitions/12885/](https://www.codabench.org/competitions/12885/)
 
 | 阶段 | 数据集 | 状态 | 说明 |
 |------|--------|------|------|
 | 第一阶段 | 训练集 | ✅ 已开放 | 训练图像（输入 + GT 配对 + 人像掩码） |
-| 第二阶段 | 测试集 A | 🔒 未开启 | 测试图像（无 GT） |
-| 第三阶段 | 测试集 B | 🔒 未开启 | 测试图像（无 GT） |
+| 第二阶段 | 测试集 A | ✅ 已开放（公开且含 GT） | 测试图像与 GT 已在 Hugging Face 公开 |
+| 第三阶段 | 测试集 B | ✅ 已开放（公开且含 GT） | 测试图像与 GT 已在 Hugging Face 公开 |
 
 
 #### 目录结构
